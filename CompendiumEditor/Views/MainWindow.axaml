@@ -1,0 +1,151 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CompendiumEditor.ViewModels"
+        xmlns:controls="using:CompendiumEditor.Controls"
+        xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        x:Class="CompendiumEditor.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="MasterplanXP - 4e Compendium Editor"
+		Icon="/Assets/Images/logo-small-icon.ico"
+        Width="1400" Height="850"
+        WindowStartupLocation="CenterScreen">
+
+	<Grid RowDefinitions="Auto, *">
+
+	<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="12" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
+			<Grid ColumnDefinitions="Auto, *, Auto, Auto">
+
+				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+					<Button Content="Open Local Repository..."
+                            Command="{Binding  SelectRepositoryFolderCommand}"
+                            Background="{DynamicResource SystemAccentColor}"
+                            Foreground="White"/>
+					<TextBlock Text="{Binding RepositoryPath}"
+                               VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Opacity="0.7"/>
+				</StackPanel>
+
+				<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="25" VerticalAlignment="Center" Margin="0,0,20,0">
+					<Button Content="💾 Save Changes"
+                            Command="{Binding SaveChangesCommand}"
+                            Background="ForestGreen"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            VerticalAlignment="Center"/>
+					
+					<ToggleSwitch IsChecked="{Binding IsClassicViewEnabled}"
+                                  OnContent="Classic View (HTML)"
+                                  OffContent="Modern View (Native)"
+                                  VerticalAlignment="Center"/>
+
+					<ToggleSwitch IsChecked="{Binding IsDarkMode}"
+                                  OnContent="Dark Theme"
+                                  OffContent="Light Theme"
+                                  VerticalAlignment="Center"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+	<Grid Grid.Row="1" ColumnDefinitions="400, 5, *, 5, *">
+			<Panel Grid.Column="0" Grid.ColumnSpan="5" ZIndex="100"
+                   Background="#AA000000"
+                   IsVisible="{Binding ShowValidationErrorAlert}">
+				<Border Background="{DynamicResource SystemChromeMediumColor}"
+                        CornerRadius="8" Padding="25"
+                        Width="550" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        BorderThickness="1" BorderBrush="Crimson">
+					<StackPanel Spacing="15">
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<TextBlock Text="⚠️" FontSize="24" VerticalAlignment="Center"/>
+							<TextBlock Text="Compendium HTML Serialization Error" FontSize="18" FontWeight="Bold" Foreground="Crimson" VerticalAlignment="Center"/>
+						</StackPanel>
+
+						<TextBlock Text="{Binding ValidationErrorMessage}" TextWrapping="Wrap" FontSize="14" Opacity="0.9"/>
+						<TextBlock Text="How do you wish to proceed with this transactional data block record context?" FontStyle="Italic" FontSize="12" Opacity="0.7"/>
+
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,15,0,0">
+							<Button Content="Go Back &amp; Correct Markup"
+                                    Command="{Binding DismissAlertAndKeepEditingCommand}"
+                                    Padding="10,6" VerticalAlignment="Center"/>
+
+							<Button Content="Discard Edits &amp; Revert to Backup"
+                                    Command="{Binding RollbackToBackupCommand}"
+                                    Background="Crimson" Foreground="White"
+                                    Padding="10,6" VerticalAlignment="Center"/>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+			</Panel>
+
+			<Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="10">
+				<TextBox Grid.Row="0"
+                         Text="{Binding SearchQuery, Mode=TwoWay}"
+                         Watermark="Search elements by ID or text string..."
+                         Margin="0,0,0,10"/>
+
+				<DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Records}"
+                          SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+						  CanUserResizeColumns="True"
+                          BorderThickness="1"
+                          BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" />
+						<DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+						<DataGridTextColumn Header="Tier" Binding="{Binding Tier}" Width="Auto" />
+						<DataGridTextColumn Header="Source" Binding="{Binding SourceBook}" Width="Auto" />
+					</DataGrid.Columns>
+				</DataGrid>
+			</Grid>
+
+			<GridSplitter Grid.Column="1" Background="Transparent"/>
+
+			<Border Grid.Column="2" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10">
+				<Grid RowDefinitions="Auto, *">
+					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
+						<TextBlock Text="RAW Compendium Source Markup Editor" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+					</Border>
+					<ae:TextEditor Grid.Row="1" Name="MarkupDocumentEditor"
+                                   Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                   FontFamily="Consolas,JetBrains Mono,Courier New"
+                                   FontSize="14"
+                                   ShowLineNumbers="True"
+                                   WordWrap="True"
+                                   HorizontalScrollBarVisibility="Disabled"
+                                   VerticalScrollBarVisibility="Visible"/>
+				</Grid>
+				
+			</Border>
+			
+			
+
+			<GridSplitter Grid.Column="3" Background="Transparent"/>
+
+			<Border Grid.Column="4" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10,10,10">
+				<Grid RowDefinitions="Auto, *">
+					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
+						<TextBlock Text="Compiled Display Output Preview" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+					</Border>
+
+					<ScrollViewer Grid.Row="1" Padding="15">
+						<Panel>
+							<controls:NativeHtmlPreviewer
+                                HtmlSource="{Binding RawHtmlContent}"
+                                TextWrapping="Wrap"
+                                IsVisible="{Binding !IsClassicViewEnabled}"/>
+
+							<controls:ClassicHtmlPreviewer
+                                HtmlSource="{Binding RawHtmlContent}"
+                                IsVisible="{Binding IsClassicViewEnabled}"/>
+						</Panel>
+					</ScrollViewer>
+				</Grid>
+			</Border>
+
+		</Grid>
+	</Grid>
+</Window>

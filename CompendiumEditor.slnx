@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="CompendiumEditor.Android/CompendiumEditor.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="CompendiumEditor.Browser/CompendiumEditor.Browser.csproj" />
+  <Project Path="CompendiumEditor.Desktop/CompendiumEditor.Desktop.csproj" />
+  <Project Path="CompendiumEditor.iOS/CompendiumEditor.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="CompendiumEditor/CompendiumEditor.csproj" />
+</Solution>

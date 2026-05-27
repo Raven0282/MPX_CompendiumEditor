@@ -1,0 +1,76 @@
+// File: App.axaml.cs
+using System;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using CompendiumEditor.Services.Configuration;
+using CompendiumEditor.Services.Data;
+using CompendiumEditor.Services.Logging;
+using CompendiumEditor.ViewModels;
+using CompendiumEditor.Views;
+
+namespace CompendiumEditor
+{
+
+public partial class App : Application
+{
+    /// <summary>
+    /// Global read-only gateway to access resolved application dependencies securely across cross-platform contexts.
+    /// </summary>
+    public static IServiceProvider Services { get; private set; } = null!;
+
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        // 1. Initialize Dependency Injection Container Mappings
+        var serviceCollection = new ServiceCollection();
+        ConfigureServices(serviceCollection);
+
+        Services = serviceCollection.BuildServiceProvider();
+
+        // 2. Load User Environment Preferences Prior to Visual Presentation
+        var config = Services.GetRequiredService<IConfigurationService>();
+        config.LoadSettings();
+
+        // 3. Apply Theme Variant based on configuration
+        RequestedThemeVariant = config.ThemeMode == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
+
+        // 4. Bind MainWindow and Contexts across App Life Cycle
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var mainWindow = Services.GetRequiredService<MainWindow>();
+            desktop.MainWindow = mainWindow;
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// Core configuration grid declaring concrete types mapping onto abstract service facades.
+    /// </summary>
+    private void ConfigureServices(IServiceCollection services)
+    {
+        // --- Core Infrastructure & Services Layer ---
+        services.AddSingleton<IDiagnosticLogger, DiagnosticLogger>();
+        services.AddSingleton<IConfigurationService, ConfigurationService>();
+        services.AddSingleton<ICompendiumExtractor, CompendiumExtractor>();
+        services.AddSingleton<ICompendiumWriter, CompendiumWriter>();
+
+        // --- Presentation ViewModels Layer ---
+        services.AddTransient<MainWindowViewModel>();
+
+        // --- Visual View Elements Layer ---
+        services.AddTransient<MainWindow>(sp => new MainWindow
+        {
+            DataContext = sp.GetRequiredService<MainWindowViewModel>()
+        });
+    }
+}
+}
