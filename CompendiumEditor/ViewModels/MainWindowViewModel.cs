@@ -248,18 +248,20 @@ namespace CompendiumEditor.ViewModels
 
                 foreach (var item in matrix)
                 {
-                    // Ensure the row contains at least 6 elements (indices 0..5)
-                    if (item is JsonArray row && row.Count >= 6)
+                    // Ensure the row contains at least 2 elements (we need at least ID and Name to create a valid record)
+                    if (item is JsonArray row && row.Count >= 2)
                     {
                         stagingList.Add(new CompendiumRecord
                         {
                             Id = row[0]?.ToString() ?? "unknown",
                             Name = row[1]?.ToString() ?? "Untitled",
-                            Tier = row[2]?.ToString() ?? "Heroic",
-                            Prerequisite = row[3]?.ToString() ?? "None",
-                            BenefitText = row[4]?.ToString() ?? "No description available.",
-                            SourceBook = row[5]?.ToString() ?? "Unknown"
-                            
+                            SourceBook = row[row.Count -1]?.ToString() ?? "Unknown",
+
+                            // For the middle fields, you can use conditional checks
+                            // to avoid the "Index out of range" error:
+                            Tier = row.Count >= 3 ? row[2]?.ToString() ?? "Heroic" : "Heroic",
+                            Prerequisite = row.Count >= 4 ? row[3]?.ToString() ?? "None" : "None",
+                            BenefitText = row.Count >= 5 ? row[4]?.ToString() ?? "No details" : "No details"
                         });
                     }
                 }
