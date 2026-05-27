@@ -43,10 +43,14 @@ namespace CompendiumEditor.ViewModels
         private List<CompendiumRecord> _allRecords = new();
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SaveChangesCommand))]
         private CompendiumRecord? _selectedRecord;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SaveChangesCommand))]
         private string? _rawHtmlContent;
+
+        private string? _originalHtmlContent;
 
         [ObservableProperty]
         private bool _isClassicViewEnabled = true;
@@ -84,6 +88,8 @@ namespace CompendiumEditor.ViewModels
         }
 
         public bool HasActiveSelection => SelectedRecord != null;
+
+        public bool IsDirty => SelectedRecord != null && RawHtmlContent != _originalHtmlContent;
 
         partial void OnSearchQueryChanged(string value)
         {
@@ -128,9 +134,11 @@ namespace CompendiumEditor.ViewModels
             else
             {
                 RawHtmlContent = string.Empty;
+                _originalHtmlContent = string.Empty;
             }
 
             OnPropertyChanged(nameof(HasActiveSelection));
+            OnPropertyChanged(nameof(IsDirty));
         }
 
         [RelayCommand]
@@ -165,7 +173,7 @@ namespace CompendiumEditor.ViewModels
         /// <summary>
         /// Explicitly commits working HTML markup edits back down to the local file asset.
         /// </summary>
-        [RelayCommand(CanExecute = nameof(HasActiveSelection))]
+        [RelayCommand(CanExecute = nameof(IsDirty))]
         public async Task SaveChangesAsync()
         {
             if (SelectedRecord == null || string.IsNullOrWhiteSpace(RepositoryPath)) return;
@@ -176,6 +184,12 @@ namespace CompendiumEditor.ViewModels
                 await _compendiumWriter.SaveRecordModificationAsync(RepositoryPath, SelectedRecord, RawHtmlContent ?? string.Empty);
 
                 _logger.Log($"SaveChangesAsync completed for ID: {SelectedRecord.Id}", "VIEWMODEL SUCCESS");
+                
+                // Reset dirty state after successful save
+                _originalHtmlContent = RawHtmlContent;
+                OnPropertyChanged(nameof(IsDirty));
+                SaveChangesCommand.NotifyCanExecuteChanged();
+                
                 ShowValidationErrorAlert = false;
             }
             catch (CompendiumValidationException valEx)
@@ -287,7 +301,7 @@ namespace CompendiumEditor.ViewModels
         {
             if (string.IsNullOrWhiteSpace(RepositoryPath)) return;
 
-            await Task.Run(async () =>
+            string? loadedHtml = await Task.Run(async () =>
             {
                 try
                 {
@@ -302,8 +316,7 @@ namespace CompendiumEditor.ViewModels
                             var root = _compendiumExtractor.ExtractObjectPayload(text);
                             if (root[record.Id] is JsonValue val)
                             {
-                                RawHtmlContent = val.ToString();
-                                return;
+                                return val.ToString();
                             }
                         }
                     }
@@ -312,7 +325,15 @@ namespace CompendiumEditor.ViewModels
                 {
                     _logger.LogException(ex, "VIEWMODEL:LOAD_RECORD");
                 }
+                return null;
             });
+
+            if (loadedHtml != null)
+            {
+                _originalHtmlContent = loadedHtml;
+                RawHtmlContent = loadedHtml;
+                OnPropertyChanged(nameof(IsDirty));
+            }
         }
     }
 }

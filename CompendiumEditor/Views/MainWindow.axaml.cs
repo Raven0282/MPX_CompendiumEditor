@@ -98,19 +98,25 @@ namespace CompendiumEditor.Views
 
         private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MainWindowViewModel.RawHtmlContent) && DataContext is MainWindowViewModel vm)
+            if (e.PropertyName == nameof(MainWindowViewModel.RawHtmlContent))
             {
-                var editor = this.FindControl<AvaloniaEdit.TextEditor>("MarkupDocumentEditor");
-                if (editor != null && !_isUpdatingEditorDirectly)
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
-                    if (editor.Text != vm.RawHtmlContent)
+                    if (DataContext is MainWindowViewModel vm)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[EDITOR DIAGNOSTIC] VM -> UI Sync. Length: {vm.RawHtmlContent?.Length ?? 0}");
-                        _isUpdatingEditorDirectly = true;
-                        editor.Text = vm.RawHtmlContent ?? string.Empty;
-                        _isUpdatingEditorDirectly = false;
+                        var editor = this.FindControl<AvaloniaEdit.TextEditor>("MarkupDocumentEditor");
+                        if (editor != null && !_isUpdatingEditorDirectly)
+                        {
+                            if (editor.Text != vm.RawHtmlContent)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[EDITOR DIAGNOSTIC] VM -> UI Sync. Length: {vm.RawHtmlContent?.Length ?? 0}");
+                                _isUpdatingEditorDirectly = true;
+                                editor.Text = vm.RawHtmlContent ?? string.Empty;
+                                _isUpdatingEditorDirectly = false;
+                            }
+                        }
                     }
-                }
+                });
             }
         }
     }
