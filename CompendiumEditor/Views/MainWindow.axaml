@@ -81,7 +81,7 @@
 			<Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="10">
 				<TextBox Grid.Row="0"
                          Text="{Binding SearchQuery, Mode=TwoWay}"
-                         Watermark="Search elements by ID or text string..."
+						 PlaceholderText="Search elements by ID or text string..."
                          Margin="0,0,0,10"/>
 
 				<DataGrid Grid.Row="1"

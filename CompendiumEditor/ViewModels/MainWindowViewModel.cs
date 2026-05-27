@@ -248,7 +248,8 @@ namespace CompendiumEditor.ViewModels
 
                 foreach (var item in matrix)
                 {
-                    if (item is JsonArray row && row.Count >= 5)
+                    // Ensure the row contains at least 6 elements (indices 0..5)
+                    if (item is JsonArray row && row.Count >= 6)
                     {
                         stagingList.Add(new CompendiumRecord
                         {
@@ -258,6 +259,7 @@ namespace CompendiumEditor.ViewModels
                             Prerequisite = row[3]?.ToString() ?? "None",
                             BenefitText = row[4]?.ToString() ?? "No description available.",
                             SourceBook = row[5]?.ToString() ?? "Unknown"
+                            
                         });
                     }
                 }

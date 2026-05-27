@@ -67,10 +67,9 @@ namespace CompendiumEditor.Services.Configuration
                 var dataModel = JsonSerializer.Deserialize<ConfigurationModel>(rawJson);
                 if (dataModel != null)
                 {
-                    // Update backing fields directly or bypass the save guard flag during hydration
-                    _themeMode = dataModel.ThemeMode;
-                    _displayRenderMode = dataModel.DisplayRenderMode;
-                    _localRepositoryPath = dataModel.LocalRepositoryPath;
+                    ThemeMode = dataModel.ThemeMode;
+                    DisplayRenderMode = dataModel.DisplayRenderMode;
+                    LocalRepositoryPath = dataModel.LocalRepositoryPath;
 
                     // Notify UI components of property updates manually since fields were set directly
                     OnPropertyChanged(nameof(ThemeMode));
