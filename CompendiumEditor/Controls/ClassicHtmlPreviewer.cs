@@ -47,6 +47,9 @@ public class ClassicHtmlPreviewer : HtmlLabel
                         font-size: 13px; 
                         margin: 0; 
                         padding: 0;
+                        word-wrap: break-word;
+                        max-width: 200px
+                        color: #333;
                     }
                     h1.player { 
                         font-size: 18px; 
