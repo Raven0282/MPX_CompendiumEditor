@@ -23,13 +23,13 @@ namespace CompendiumEditor.Services.Data
         /// </summary>
         private string HealJson(string json)
         {
-            // 1. Handle keys at the start of lines or after opening braces
-            // We match identifiers followed by a colon. 
-            // We use a negative lookbehind to ensure we aren't matching inside a string (simplistic check).
-            string pattern = @"(?<prefix>\{|,|\r?\n)\s*(?<key>[a-zA-Z0-9_]+)\s*:";
-            string healed = Regex.Replace(json, pattern, "${prefix}\"${key}\":");
+            // 1. Handle keys at the start of lines or after opening braces.
+            // We ensure we only match keys that are NOT inside double quotes.
+            // Strict pattern: Start of line, optional whitespace, alphanumeric key, colon.
+            string pattern = @"(?<prefix>\{|,|^\s*)(?<key>[a-zA-Z0-9_]+)\s*:";
+            string healed = Regex.Replace(json, pattern, "${prefix}\"${key}\":", RegexOptions.Multiline);
             
-            // 2. Special case: If the very first key starts immediately after the first { without a newline
+            // 2. Special case for the very first key if it's on the same line as the brace.
             if (healed.StartsWith("{") && !healed.StartsWith("{\"") && !healed.StartsWith("{\r") && !healed.StartsWith("{\n"))
             {
                 healed = Regex.Replace(healed, @"^\{\s*(?<key>[a-zA-Z0-9_]+)\s*:", "{\r\n  \"${key}\":");

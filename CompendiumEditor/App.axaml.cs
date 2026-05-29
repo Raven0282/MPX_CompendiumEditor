@@ -61,7 +61,16 @@ public partial class App : Application
         services.AddSingleton<IDiagnosticLogger, DiagnosticLogger>();
         services.AddSingleton<IConfigurationService, ConfigurationService>();
         services.AddSingleton<ICompendiumExtractor, CompendiumExtractor>();
-        services.AddSingleton<ICompendiumWriter, CompendiumWriter>();
+        
+        // --- Compendium Writer Strategy Pattern ---
+        services.AddSingleton<GeneralCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, MonsterCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, GlossaryCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, ClassCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, ArmorCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, BackgroundCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, CompanionCompendiumWriter>();
+        services.AddSingleton<ICompendiumWriter, CompendiumWriterDispatcher>();
 
         // --- Presentation ViewModels Layer ---
         services.AddTransient<MainWindowViewModel>();
