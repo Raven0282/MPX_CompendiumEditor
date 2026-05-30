@@ -25,7 +25,6 @@ namespace CompendiumEditor.Services.Data
         {
             // 1. Handle keys at the start of lines or after opening braces.
             // We ensure we only match keys that are NOT inside double quotes.
-            // Strict pattern: Start of line, optional whitespace, alphanumeric key, colon.
             string pattern = @"(?<prefix>\{|,|^\s*)(?<key>[a-zA-Z0-9_]+)\s*:";
             string healed = Regex.Replace(json, pattern, "${prefix}\"${key}\":", RegexOptions.Multiline);
             
@@ -34,6 +33,10 @@ namespace CompendiumEditor.Services.Data
             {
                 healed = Regex.Replace(healed, @"^\{\s*(?<key>[a-zA-Z0-9_]+)\s*:", "{\r\n  \"${key}\":");
             }
+
+            // 3. LEGACY FIX: Remove invalid Javascript-only escape sequences (like \') 
+            // that are not part of the strict JSON specification but exist in the source JS files.
+            healed = healed.Replace(@"\'", "'");
 
             if (healed.Length != json.Length)
             {

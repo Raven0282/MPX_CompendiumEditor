@@ -70,6 +70,9 @@ public partial class App : Application
         services.AddSingleton<ICategoryCompendiumWriter, ArmorCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, BackgroundCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, CompanionCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, PowerCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, FeatCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, ItemCompendiumWriter>();
         services.AddSingleton<ICompendiumWriter, CompendiumWriterDispatcher>();
 
         // --- Presentation ViewModels Layer ---

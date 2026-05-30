@@ -417,8 +417,48 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
     {
         string path = Path.Combine(parentPath, "catalog.js");
         if (!File.Exists(path)) return;
-        _logger.Log($"Top-level catalog detected at {path}. (Static for edits).", "WRITER:TOP_CATALOG");
-        await Task.CompletedTask;
+
+        _logger.Log($"Updating top-level catalog counts: {path}", "WRITER:TOP_CATALOG");
+        await CreateBackupSnapshotAsync(parentPath, path);
+        string rawText = await File.ReadAllTextAsync(path);
+        
+        JsonNode root = _extractor.ExtractObjectPayload(rawText);
+        var obj = root.AsObject();
+
+        // 1. Identify category from ID (e.g. "feat123" -> "feat")
+        string category = Regex.Replace(id, @"\d+", "").ToLowerInvariant();
+
+        // 2. Get current actual count from the category's _listing.js
+        // parentPath is the root, we need to find the category subfolder.
+        // Usually repositoryPath (passed in public methods) is parentPath/category.
+        // We can infer the local listing path by looking at the category name.
+        string categoryDir = Path.Combine(parentPath, category);
+        string listingPath = Path.Combine(categoryDir, "_listing.js");
+
+        if (File.Exists(listingPath))
+        {
+            try 
+            {
+                string listingContent = await File.ReadAllTextAsync(listingPath);
+                JsonArray matrix = _extractor.ExtractArrayPayload(listingContent);
+                int actualCount = matrix.Count;
+
+                _logger.Log($"Syncing {category} count to {actualCount} in catalog.js", "WRITER:TOP_CATALOG");
+                obj[category] = JsonValue.Create(actualCount);
+
+                string newJson = root.ToJsonString(GetModernOptions());
+                newJson = FormatForLegacy(newJson, rawText);
+                await SplicedWriteAsync(path, rawText, newJson, '{', '}');
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex, "WRITER:TOP_CATALOG_SYNC");
+            }
+        }
+        else
+        {
+            _logger.Log($"Could not find _listing.js for {category} to verify count. Skipping catalog update.", "WRITER:TOP_CATALOG WARNING");
+        }
     }
 
     protected async Task SplicedWriteAsync(string path, string originalText, string newJson, char openChar, char closeChar)
