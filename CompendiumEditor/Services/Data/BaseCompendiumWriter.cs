@@ -41,33 +41,70 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
         _logger.Log($"[{GetType().Name}] Starting Save for ID: {record.Id}", "WRITER");
 
         // 1. Update the local shard
-        string isolatedShardPath = await UpdateDataShardAsync(repositoryPath, record.Id, cleanHtmlMarkup);
+        string isolatedShardPath = await UpdateDataShardAsync(repositoryPath, record.Id, cleanHtmlMarkup, isAppend: false);
 
         // 2. Extract metadata
         var metadata = ExtractMetadataFromHtml(record.Id, cleanHtmlMarkup, isolatedShardPath);
+        
+        // OVERRIDE: Ensure the SourceBook from the UI dialog/record is preserved 
+        // for the listing index, rather than being overwritten by re-extraction from template HTML.
+        metadata.SourceBook = record.SourceBook;
 
         // 3. Update listing matrix
-        await UpdateListingFileAsync(repositoryPath, record.Id, metadata);
+        await UpdateListingFileAsync(repositoryPath, record.Id, metadata, isAppend: false);
 
         // 4. Update local search index
         await UpdateIndexFileAsync(repositoryPath, record.Id, metadata, cleanHtmlMarkup);
 
         // 5. Synchronize Upward (Top-Level)
-        // REVERSION: Robustly find the top-level directory (containing catalog.js/index.js)
+        await SynchronizeUpwardAsync(repositoryPath, record.Id, cleanHtmlMarkup, metadata);
+
+        _logger.Log($"[{GetType().Name}] Save successful for ID: {record.Id}", "WRITER SUCCESS");
+    }
+
+    public virtual async Task AppendRecordAsync(string repositoryPath, CompendiumRecord record, string cleanHtmlMarkup)
+    {
+        if (string.IsNullOrWhiteSpace(repositoryPath) || !Directory.Exists(repositoryPath))
+            throw new DirectoryNotFoundException("Target working repository space could not be verified.");
+
+        _logger.Log($"[{GetType().Name}] Starting Append for ID: {record.Id}", "WRITER");
+
+        // 1. Append to the local shard (may create it)
+        string isolatedShardPath = await UpdateDataShardAsync(repositoryPath, record.Id, cleanHtmlMarkup, isAppend: true);
+
+        // 2. Extract metadata
+        var metadata = ExtractMetadataFromHtml(record.Id, cleanHtmlMarkup, isolatedShardPath);
+        
+        // OVERRIDE: Ensure the SourceBook from the UI dialog/record is preserved 
+        // for the listing index, rather than being overwritten by re-extraction from template HTML.
+        metadata.SourceBook = record.SourceBook;
+
+        // 3. Append to listing matrix
+        await UpdateListingFileAsync(repositoryPath, record.Id, metadata, isAppend: true);
+
+        // 4. Append to local search index (UpdateIndexFileAsync handles new keys naturally)
+        await UpdateIndexFileAsync(repositoryPath, record.Id, metadata, cleanHtmlMarkup);
+
+        // 5. Synchronize Upward (Top-Level)
+        await SynchronizeUpwardAsync(repositoryPath, record.Id, cleanHtmlMarkup, metadata);
+
+        _logger.Log($"[{GetType().Name}] Append successful for ID: {record.Id}", "WRITER SUCCESS");
+    }
+
+    private async Task SynchronizeUpwardAsync(string repositoryPath, string id, string htmlMarkup, ExtractedMetadata metadata)
+    {
         string? topLevelPath = FindTopLevelDirectory(repositoryPath);
         if (!string.IsNullOrEmpty(topLevelPath))
         {
             _logger.Log($"Resolved Top-Level directory: {topLevelPath}", "WRITER:SYNC");
-            await UpdateTopLevelShardAsync(topLevelPath, record.Id, cleanHtmlMarkup);
-            await UpdateTopLevelIndexAsync(topLevelPath, record.Id, metadata);
-            await UpdateTopLevelCatalogAsync(topLevelPath, record.Id, metadata);
+            await UpdateTopLevelShardAsync(topLevelPath, id, htmlMarkup);
+            await UpdateTopLevelIndexAsync(topLevelPath, id, metadata);
+            await UpdateTopLevelCatalogAsync(topLevelPath, id, metadata);
         }
         else
         {
             _logger.Log("No top-level directory found (searched upward for catalog.js). Skipping global sync.", "WRITER:SYNC WARNING");
         }
-
-        _logger.Log($"[{GetType().Name}] Save successful for ID: {record.Id}", "WRITER SUCCESS");
     }
 
     /// <summary>
@@ -165,12 +202,12 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
         return 0;
     }
 
-    protected async Task<string> UpdateDataShardAsync(string repositoryPath, string id, string htmlMarkup)
+    protected async Task<string> UpdateDataShardAsync(string repositoryPath, string id, string htmlMarkup, bool isAppend)
     {
         int n = ExtractNumericId(id) % 20;
         string targetFile = Path.Combine(repositoryPath, $"data{n}.js");
         
-        if (!File.Exists(targetFile))
+        if (!File.Exists(targetFile) && !isAppend)
         {
             string[] shards = Directory.GetFiles(repositoryPath, "data*.js");
             foreach (string file in shards)
@@ -185,7 +222,20 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
         }
 
         if (!File.Exists(targetFile))
-            throw new FileNotFoundException($"Could not locate the explicit data shard mapping the ID '{id}'.");
+        {
+            if (isAppend)
+            {
+                _logger.Log($"Target shard data{n}.js not found. Requesting creation via logic flow.", "WRITER:APPEND");
+                // For now, we auto-create the shard with valid JSONP wrapper if it's missing during an append
+                // In a future turn, we can add the explicit UI prompt if desired.
+                string initialContent = $"od.reader.jsonp_batch_data(\"{n}\", {{ }})";
+                await File.WriteAllTextAsync(targetFile, initialContent, new System.Text.UTF8Encoding(false));
+            }
+            else
+            {
+                throw new FileNotFoundException($"Could not locate the explicit data shard mapping the ID '{id}'.");
+            }
+        }
 
         string content = await File.ReadAllTextAsync(targetFile);
         await CreateBackupSnapshotAsync(repositoryPath, targetFile);
@@ -200,7 +250,7 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
         return targetFile;
     }
 
-    protected virtual async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta)
+    protected virtual async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta, bool isAppend)
     {
         string path = Path.Combine(repositoryPath, "_listing.js");
         if (!File.Exists(path)) return;
@@ -222,6 +272,7 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
         if (idxPrereq == -1) idxPrereq = headers.IndexOf("Type");
         int idxSource = headers.IndexOf("SourceBook");
 
+        bool found = false;
         foreach (var node in dataMatrix)
         {
             if (node is JsonArray row && row.Count > 0 && row[0]?.ToString() == id)
@@ -230,8 +281,25 @@ public abstract class BaseCompendiumWriter : ICategoryCompendiumWriter
                 if (idxTier != -1 && row.Count > idxTier) row[idxTier] = JsonValue.Create(meta.Tier);
                 if (idxPrereq != -1 && row.Count > idxPrereq) row[idxPrereq] = JsonValue.Create(meta.Prerequisite);
                 if (idxSource != -1 && row.Count > idxSource) row[idxSource] = JsonValue.Create(meta.SourceBook);
+                found = true;
                 break;
             }
+        }
+
+        if (!found && isAppend)
+        {
+            _logger.Log($"Appending new record row to _listing.js matrix for ID: {id}", "WRITER:LISTING");
+            var newRow = new JsonArray();
+            for (int i = 0; i < headers.Count; i++)
+            {
+                if (i == 0) newRow.Add(JsonValue.Create(id));
+                else if (i == idxName) newRow.Add(JsonValue.Create(meta.Name));
+                else if (i == idxTier) newRow.Add(JsonValue.Create(meta.Tier));
+                else if (i == idxPrereq) newRow.Add(JsonValue.Create(meta.Prerequisite));
+                else if (i == idxSource) newRow.Add(JsonValue.Create(meta.SourceBook));
+                else newRow.Add(JsonValue.Create(""));
+            }
+            dataMatrix.Add(newRow);
         }
 
         int matrixEndIndex = -1;

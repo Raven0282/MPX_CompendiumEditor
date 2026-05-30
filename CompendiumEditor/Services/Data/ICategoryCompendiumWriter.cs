@@ -18,4 +18,9 @@ public interface ICategoryCompendiumWriter
     /// Executes the specialized save logic for this category.
     /// </summary>
     Task SaveRecordModificationAsync(string repositoryPath, CompendiumRecord record, string cleanHtmlMarkup);
+
+    /// <summary>
+    /// Appends a new record to the category data files.
+    /// </summary>
+    Task AppendRecordAsync(string repositoryPath, CompendiumRecord record, string cleanHtmlMarkup);
 }

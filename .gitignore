@@ -453,3 +453,5 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 /CompendiumEditor/gemini/gemini.md
+/gemini/plans
+/CompendiumEditor/ScratchFiles/TopLevel

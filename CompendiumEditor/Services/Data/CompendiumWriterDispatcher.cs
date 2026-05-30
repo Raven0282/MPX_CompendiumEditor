@@ -47,6 +47,22 @@ public class CompendiumWriterDispatcher : ICompendiumWriter
         }
     }
 
+    public async Task AppendRecordAsync(string repositoryPath, CompendiumRecord record, string cleanHtmlMarkup)
+    {
+        var writer = _specializedWriters.FirstOrDefault(w => w.CanHandle(repositoryPath));
+
+        if (writer != null)
+        {
+            _logger.Log($"Routing Append to specialized writer: {writer.GetType().Name}", "DISPATCHER");
+            await writer.AppendRecordAsync(repositoryPath, record, cleanHtmlMarkup);
+        }
+        else
+        {
+            _logger.Log("No specialized writer found. Routing to General fallback for Append.", "DISPATCHER");
+            await _fallbackWriter.AppendRecordAsync(repositoryPath, record, cleanHtmlMarkup);
+        }
+    }
+
     /// <summary>
     /// Backup restoration is currently folder-based and generic across all categories.
     /// </summary>

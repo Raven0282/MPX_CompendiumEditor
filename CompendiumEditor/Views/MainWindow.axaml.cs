@@ -118,6 +118,15 @@ namespace CompendiumEditor.Views
                     }
                 });
             }
+            if (e.PropertyName == nameof(MainWindowViewModel.SelectedRecord))
+            {
+                var vm = (MainWindowViewModel)DataContext!;
+                if (vm.SelectedRecord != null)
+                {
+                    var grid = this.FindControl<DataGrid>("RecordsDataGrid"); // Add Name to DataGrid in XAML
+                    grid?.ScrollIntoView(vm.SelectedRecord, null);
+                }
+            }
         }
     }
 }

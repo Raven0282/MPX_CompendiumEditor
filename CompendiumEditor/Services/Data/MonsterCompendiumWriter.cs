@@ -77,7 +77,7 @@ public class MonsterCompendiumWriter : BaseCompendiumWriter
         };
     }
 
-    protected override async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta)
+    protected override async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta, bool isAppend)
     {
         string path = Path.Combine(repositoryPath, "_listing.js");
         if (!File.Exists(path)) return;
@@ -103,6 +103,24 @@ public class MonsterCompendiumWriter : BaseCompendiumWriter
                 found = true;
                 break;
             }
+        }
+
+        if (!found && isAppend)
+        {
+            _logger.Log($"Appending new monster row to _listing.js matrix for ID: {id}", "WRITER:MONSTER");
+            var newRow = new JsonArray
+            {
+                JsonValue.Create(id),
+                JsonValue.Create(mMeta.Name),
+                JsonValue.Create(mMeta.Tier),
+                JsonValue.Create(mMeta.Prerequisite),
+                JsonValue.Create(mMeta.BenefitText),
+                JsonValue.Create(mMeta.Size),
+                JsonValue.Create(mMeta.CreatureType),
+                JsonValue.Create(mMeta.SourceBook)
+            };
+            dataMatrix.Add(newRow);
+            found = true;
         }
 
         if (!found) _logger.Log($"ID {id} not found in Monster listing matrix!", "WRITER:MONSTER_LISTING WARNING");

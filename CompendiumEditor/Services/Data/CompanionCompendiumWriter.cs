@@ -2,7 +2,9 @@
 using CompendiumEditor.Exceptions;
 using CompendiumEditor.Services.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -65,7 +67,7 @@ public class CompanionCompendiumWriter : BaseCompendiumWriter
         };
     }
 
-    protected override async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta)
+    protected override async Task UpdateListingFileAsync(string repositoryPath, string id, ExtractedMetadata meta, bool isAppend)
     {
         string path = Path.Combine(repositoryPath, "_listing.js");
         if (!File.Exists(path)) return;
@@ -89,6 +91,22 @@ public class CompanionCompendiumWriter : BaseCompendiumWriter
                 found = true;
                 break;
             }
+        }
+
+        if (!found && isAppend)
+        {
+            _logger.Log($"Appending new companion row to _listing.js matrix for ID: {id}", "WRITER:COMPANION");
+            var newRow = new JsonArray
+            {
+                JsonValue.Create(id),
+                JsonValue.Create(cMeta.Name),
+                JsonValue.Create(cMeta.Tier),
+                JsonValue.Create(cMeta.Size),
+                JsonValue.Create(cMeta.CreatureType),
+                JsonValue.Create(cMeta.SourceBook)
+            };
+            dataMatrix.Add(newRow);
+            found = true;
         }
 
         if (!found) _logger.Log($"ID {id} not found in Companion listing matrix!", "WRITER:COMPANION_LISTING WARNING");

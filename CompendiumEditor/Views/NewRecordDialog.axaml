@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CompendiumEditor.ViewModels"
+        xmlns:views="using:CompendiumEditor.Views"
+        x:Class="CompendiumEditor.Views.NewRecordDialog"
+        x:DataType="views:NewRecordDialog"
+        Title="Initialize New Comp  bendium Record"
+        Width="400" Height="310"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+    
+    <Border Padding="20">
+        <StackPanel Spacing="15">
+            <TextBlock Text="New Record Metadata" FontSize="18" FontWeight="Bold"/>
+            
+            <StackPanel Spacing="5">
+                <TextBlock Text="Generated ID (Read-Only):" Opacity="0.7" FontSize="12"/>
+                <TextBox Text="{Binding GeneratedId}" IsReadOnly="True" Background="{DynamicResource SystemChromeLowColor}"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Entry Name:" FontSize="12"/>
+                <TextBox Text="{Binding RecordName, Mode=TwoWay}" Watermark="e.g. Cleave, Fireball, Orc Grunt"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Source Book:" FontSize="12"/>
+                <ComboBox ItemsSource="{Binding ExistingSources}"
+                          Text="{Binding SourceBook, Mode=TwoWay}"
+                          IsEditable="True"
+                          HorizontalAlignment="Stretch"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                <Button Content="Cancel" Click="Cancel_Click"/>
+                <Button Content="Start Editing" 
+                        Click="Start_Click"
+                        IsEnabled="{Binding !!RecordName}"
+                        Background="{DynamicResource SystemAccentColor}" 
+                        Foreground="White"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -38,7 +38,10 @@ namespace CompendiumEditor.ViewModels
         private string _searchQuery = string.Empty;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RecordCount))]
         private ObservableCollection<CompendiumRecord> _records = new();
+
+        public int RecordCount => Records.Count;
 
         private List<CompendiumRecord> _allRecords = new();
 
@@ -57,6 +60,9 @@ namespace CompendiumEditor.ViewModels
 
         [ObservableProperty]
         private bool _isDarkMode = true;
+
+        [ObservableProperty]
+        private bool _isAppendMode;
 
         [ObservableProperty]
         private bool _showValidationErrorAlert;
@@ -88,6 +94,8 @@ namespace CompendiumEditor.ViewModels
         }
 
         public bool HasActiveSelection => SelectedRecord != null;
+
+        public bool CanAppend => IsDataLoaded && HasActiveSelection;
 
         public bool IsDirty => SelectedRecord != null && RawHtmlContent != _originalHtmlContent;
 
@@ -138,7 +146,9 @@ namespace CompendiumEditor.ViewModels
             }
 
             OnPropertyChanged(nameof(HasActiveSelection));
+            OnPropertyChanged(nameof(CanAppend));
             OnPropertyChanged(nameof(IsDirty));
+            AppendNewRecordCommand.NotifyCanExecuteChanged();
         }
 
         [RelayCommand]
@@ -204,6 +214,109 @@ namespace CompendiumEditor.ViewModels
                 _logger.LogException(ex, "VIEWMODEL:SAVE");
                 ValidationErrorTitle = "System Subsystem Operation Failure Alert";
                 ValidationErrorMessage = $"An unexpected failure prevented saving records to disk securely. Details: {ex.Message}";
+                ShowValidationErrorAlert = true;
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanAppend))]
+        public async Task AppendNewRecordAsync()
+        {
+            if (string.IsNullOrWhiteSpace(RepositoryPath)) return;
+
+            string folderName = Path.GetFileName(RepositoryPath.TrimEnd(Path.DirectorySeparatorChar));
+            string prefix = folderName.ToLowerInvariant();
+
+            // Find max ID for this prefix
+            int maxId = 0;
+            foreach (var record in _allRecords)
+            {
+                if (record.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    string suffix = record.Id.Substring(prefix.Length);
+                    if (int.TryParse(suffix, out int val) && val > maxId)
+                    {
+                        maxId = val;
+                    }
+                }
+            }
+
+            string suggestedId = $"{prefix}{maxId + 1}";
+
+            // Extract unique sourcebooks for the dropdown
+            var sources = _allRecords
+                .Select(r => r.SourceBook)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .OrderBy(s => s)
+                .ToList();
+
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+            {
+                var dialog = new Views.NewRecordDialog
+                {
+                    GeneratedId = suggestedId,
+                    ExistingSources = new ObservableCollection<string>(sources)
+                };
+
+                var result = await dialog.ShowDialog<Views.NewRecordResult>(desktop.MainWindow);
+
+                if (result != null)
+                {
+                    _logger.Log($"Starting Append Mode for ID: {result.Id}", "VIEWMODEL");
+                    
+                    var newRecord = new CompendiumRecord
+                    {
+                        Id = result.Id,
+                        Name = result.Name,
+                        SourceBook = result.Source,
+                        Tier = "Heroic",
+                        Prerequisite = "None",
+                        BenefitText = ""
+                    };
+
+                    // If we have a selection, use its HTML as a template
+                    string templateHtml = RawHtmlContent ?? "<div>New entry content</div>";
+
+                    IsAppendMode = true;
+                    _allRecords.Insert(0, newRecord);
+                    ApplyFiltering();
+                    SelectedRecord = newRecord;
+                    RawHtmlContent = templateHtml;
+                    _originalHtmlContent = null; // Forces dirty state
+                    
+                    OnPropertyChanged(nameof(IsDirty));
+                    SaveChangesCommand.NotifyCanExecuteChanged();
+                    CommitNewRecordCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(IsAppendMode))]
+        public async Task CommitNewRecordAsync()
+        {
+            if (SelectedRecord == null || string.IsNullOrWhiteSpace(RepositoryPath)) return;
+
+            _logger.Log($"CommitNewRecordAsync triggered for ID: {SelectedRecord.Id}", "VIEWMODEL");
+            try
+            {
+                await _compendiumWriter.AppendRecordAsync(RepositoryPath, SelectedRecord, RawHtmlContent ?? string.Empty);
+
+                _logger.Log($"CommitNewRecordAsync completed for ID: {SelectedRecord.Id}", "VIEWMODEL SUCCESS");
+                
+                IsAppendMode = false;
+                _originalHtmlContent = RawHtmlContent;
+                
+                OnPropertyChanged(nameof(IsDirty));
+                SaveChangesCommand.NotifyCanExecuteChanged();
+                CommitNewRecordCommand.NotifyCanExecuteChanged();
+                
+                ShowValidationErrorAlert = false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex, "VIEWMODEL:COMMIT");
+                ValidationErrorTitle = "Append Operation Failure";
+                ValidationErrorMessage = $"Failed to append new record: {ex.Message}";
                 ShowValidationErrorAlert = true;
             }
         }
@@ -289,6 +402,7 @@ namespace CompendiumEditor.ViewModels
 
                 _allRecords = stagingList;
                 IsDataLoaded = true;
+                OnPropertyChanged(nameof(RecordCount));
                 _logger.Log($"Collection population completed. ObservableCollection count: {Records.Count}. IsDataLoaded set to: {IsDataLoaded}", "DIAGNOSTIC STAGE 4 SUCCESS");
             }
             catch (Exception ex)
