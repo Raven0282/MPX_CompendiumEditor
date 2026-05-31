@@ -82,6 +82,8 @@ public partial class App : Application
         services.AddSingleton<ICategoryCompendiumWriter, ThemeCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, EpicDestinyCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, DiseaseCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, RaceCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, PoisonCompendiumWriter>();
         services.AddSingleton<ICompendiumWriter, CompendiumWriterDispatcher>();
 
         // --- Presentation ViewModels Layer ---
