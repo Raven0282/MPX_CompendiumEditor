@@ -21,29 +21,34 @@
 	<Grid RowDefinitions="Auto, *">
 
 	<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="12" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
-			<Grid ColumnDefinitions="Auto, *, Auto, Auto">
+			<Grid ColumnDefinitions="Auto, *, Auto">
 
+				<!-- Zone 1: Left Actions (Fixed) -->
 				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-					<Button Content="Open Repo Folder..."
+					<Button Content="Select Folder"
                             Command="{Binding SelectRepositoryFolderCommand}"
                             Background="{DynamicResource SystemAccentColor}"
                             Foreground="White"/>
 					
-					<Button Content="➕ Append New..."
+					<Button Content="➕ New Record"
                             Command="{Binding AppendNewRecordCommand}"
 							IsVisible="{Binding !IsAppendMode}"
                             Background="{DynamicResource SystemListLowColor}"
                             VerticalAlignment="Center"/>
+				</StackPanel>
 
-					<TextBlock Text="{Binding RepositoryPath}"
-                               VerticalAlignment="Center"
-                               FontStyle="Italic"
-                               Opacity="0.7"/>
+				<!-- Zone 2: Centered Metadata (Fluid but non-shifting) -->
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<TextBlock Text="{Binding DisplayRepositoryPath}"
+							   VerticalAlignment="Center"
+							   FontStyle="Italic"
+							   Opacity="0.7"
+							   TextTrimming="CharacterEllipsis"
+							   MaxWidth="450"/>
 
 					<Border Background="{DynamicResource SystemAccentColor}" 
 							CornerRadius="12" 
 							Padding="8,2" 
-							Margin="10,0"
 							IsVisible="{Binding IsDataLoaded}"
 							VerticalAlignment="Center">
 						<StackPanel Orientation="Horizontal" Spacing="4">
@@ -60,22 +65,25 @@
 					</Border>
 				</StackPanel>
 
-				<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="25" VerticalAlignment="Center" Margin="0,0,20,0">
-					<Button Content="💾 Save Changes"
-                            Command="{Binding SaveChangesCommand}"
-							IsVisible="{Binding !IsAppendMode}"
-                            Background="ForestGreen"
-                            Foreground="White"
-                            FontWeight="SemiBold"
-                            VerticalAlignment="Center"/>
+				<!-- Zone 3: Right Actions & Toggles (Pinned Right) -->
+				<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center" Margin="0,0,10,0">
+					<Panel>
+						<Button Content="💾 Save Changes"
+								Command="{Binding SaveChangesCommand}"
+								IsVisible="{Binding !IsAppendMode}"
+								Background="ForestGreen"
+								Foreground="White"
+								FontWeight="SemiBold"
+								VerticalAlignment="Center"/>
 
-					<Button Content="✨ Commit New Record"
-                            Command="{Binding CommitNewRecordCommand}"
-							IsVisible="{Binding IsAppendMode}"
-                            Background="DarkOrange"
-                            Foreground="White"
-                            FontWeight="SemiBold"
-                            VerticalAlignment="Center"/>
+						<Button Content="✨ Commit New"
+								Command="{Binding CommitNewRecordCommand}"
+								IsVisible="{Binding IsAppendMode}"
+								Background="DarkOrange"
+								Foreground="White"
+								FontWeight="SemiBold"
+								VerticalAlignment="Center"/>
+					</Panel>
 					
 					<ToggleSwitch IsChecked="{Binding IsClassicViewEnabled}"
                                   OnContent="Classic View (HTML)"
@@ -83,8 +91,8 @@
                                   VerticalAlignment="Center"/>
 
 					<ToggleSwitch IsChecked="{Binding IsDarkMode}"
-                                  OnContent="Dark Theme"
-                                  OffContent="Light Theme"
+                                  OnContent="Dark"
+                                  OffContent="Light"
                                   VerticalAlignment="Center"/>
 				</StackPanel>
 			</Grid>
@@ -148,7 +156,7 @@
 			<Border Grid.Column="2" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10">
 				<Grid RowDefinitions="Auto, *">
 					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
-						<TextBlock Text="RAW Compendium Source Markup Editor" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+						<TextBlock Text="RAW Source Markup Editor" HorizontalAlignment="Center" FontWeight="SemiBold"/>
 					</Border>
 					<ae:TextEditor Grid.Row="1" Name="MarkupDocumentEditor"
                                    Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
@@ -167,18 +175,21 @@
 			<Border Grid.Column="4" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10,10,10">
 				<Grid RowDefinitions="Auto, *">
 					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
-						<TextBlock Text="Compiled Display Output Preview" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+						<TextBlock Text="Output Display Preview" HorizontalAlignment="Center" FontWeight="SemiBold"/>
 					</Border>
 
-					<ScrollViewer Grid.Row="1" Padding="20" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">						
-						<Panel>
+					<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">						
+						<Panel Margin="15">
 							<controls:NativeHtmlPreviewer
                                 HtmlSource="{Binding RawHtmlContent}"
                                 TextWrapping="Wrap"
+								VerticalAlignment="Top"
                                 IsVisible="{Binding !IsClassicViewEnabled}"/>
 
 							<controls:ClassicHtmlPreviewer
 								HtmlSource="{Binding RawHtmlContent}"
+								CssStyles="{Binding InjectedStyles}"
+								VerticalAlignment="Top"
 								IsVisible="{Binding IsClassicViewEnabled}"/>
 						</Panel>
 					</ScrollViewer>

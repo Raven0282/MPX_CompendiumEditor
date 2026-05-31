@@ -15,20 +15,31 @@ public class ClassicHtmlPreviewer : HtmlLabel
     public static readonly StyledProperty<string> HtmlSourceProperty =
         AvaloniaProperty.Register<ClassicHtmlPreviewer, string>(nameof(HtmlSource), string.Empty);
 
+    public static readonly StyledProperty<string> CssStylesProperty =
+        AvaloniaProperty.Register<ClassicHtmlPreviewer, string>(nameof(CssStyles), string.Empty);
+
     public string HtmlSource
     {
         get => GetValue(HtmlSourceProperty);
         set => SetValue(HtmlSourceProperty, value);
     }
 
-    static ClassicHtmlPreviewer()
+    public string CssStyles
     {
-        HtmlSourceProperty.Changed.AddClassHandler<ClassicHtmlPreviewer>((control, e) => control.OnHtmlSourceChanged(e));
+        get => GetValue(CssStylesProperty);
+        set => SetValue(CssStylesProperty, value);
     }
 
-    private void OnHtmlSourceChanged(AvaloniaPropertyChangedEventArgs e)
+    static ClassicHtmlPreviewer()
     {
-        string rawHtml = e.GetNewValue<string>();
+        HtmlSourceProperty.Changed.AddClassHandler<ClassicHtmlPreviewer>((control, e) => control.UpdateText());
+        CssStylesProperty.Changed.AddClassHandler<ClassicHtmlPreviewer>((control, e) => control.UpdateText());
+    }
+
+    private void UpdateText()
+    {
+        string rawHtml = HtmlSource;
+        string css = CssStyles;
 
         if (string.IsNullOrWhiteSpace(rawHtml))
         {
@@ -38,42 +49,8 @@ public class ClassicHtmlPreviewer : HtmlLabel
 
         try
         {
-            // Inject localized inline stylesheet variables matching the compendium layout profile
-            // This guarantees uniform presentation colors regardless of global window margins
-            string scopedStyleHeader = @"
-                <style>
-                    body { 
-                        font-family: 'Segoe UI', Helvetica, Arial, sans-serif; 
-                        font-size: 13px; 
-                        margin: 0; 
-                        padding: 0;
-                        word-wrap: break-word;
-                        max-width: 200px
-                        color: #333;
-                    }
-                    h1.player { 
-                        font-size: 18px; 
-                        color: #B11226; 
-                        font-weight: bold; 
-                        margin-bottom: 4px; 
-                        padding-bottom: 2px;
-                        border-bottom: 1px solid #B11226;
-                    }
-                    p.flavor { 
-                        font-style: italic; 
-                        margin-top: 2px; 
-                        margin-bottom: 6px; 
-                    }
-                    p.publishedIn { 
-                        font-size: 11px; 
-                        font-style: italic; 
-                        color: #666; 
-                        margin-top: 10px; 
-                    }
-                </style>";
-
             // Update the underlying HTML core engine canvas document securely
-            Text = $"{scopedStyleHeader}<body>{rawHtml}</body>";
+            Text = $"<style>{css}</style><body>{rawHtml}</body>";
         }
         catch
         {
