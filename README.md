@@ -25,7 +25,7 @@ Any work with the Online Compendium assumes you have downloaded a local copy. On
 4. Click the +New Record button.
 5. A dialog box appears.  Fill out the Name of the Entry you want, add a source. Click the Start Editing button.
    ** Note ** When entering a source, try to use the sources already in place instead of creating your own for the same resource. (e.g., PHB is in the list, don't add Players' Handbook. The dialog shows a listing of existing sources and you can start typing and it will search.
-6. Modify the selected entry to match what you want to add.  Try to follow the format already created for the entry.  You will see your changes interactively on the Preview Pane. 
+7. Modify the selected entry to match what you want to add.  Try to follow the format already created for the entry.  You will see your changes interactively on the Preview Pane. 
 
 
 
