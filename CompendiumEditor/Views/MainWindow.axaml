@@ -8,7 +8,7 @@
 		mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
 		x:Class="CompendiumEditor.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="MasterplanXP - 4e Compendium Editor"
+        Title="MasterplanXP - Compendium Editor (Alpha Build)"
 		Icon="/Assets/Images/logo-small-icon.ico"
         Width="1400" Height="850"
 		MinWidth="900" MinHeight="600"
@@ -20,11 +20,11 @@
 
 	<Grid RowDefinitions="Auto, *">
 
-	<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="12" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
+	<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="20" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
 			<Grid ColumnDefinitions="Auto, *, Auto">
 
 				<!-- Zone 1: Left Actions (Fixed) -->
-				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="5,0,20,0">
 					<Button Content="Select Folder"
                             Command="{Binding SelectRepositoryFolderCommand}"
                             Background="{DynamicResource SystemAccentColor}"
@@ -38,15 +38,8 @@
 				</StackPanel>
 
 				<!-- Zone 2: Centered Metadata (Fluid but non-shifting) -->
-				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<TextBlock Text="{Binding DisplayRepositoryPath}"
-							   VerticalAlignment="Center"
-							   FontStyle="Italic"
-							   Opacity="0.7"
-							   TextTrimming="CharacterEllipsis"
-							   MaxWidth="450"/>
-
-					<Border Background="{DynamicResource SystemAccentColor}" 
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" HorizontalAlignment="Left" VerticalAlignment="Center">
+						<Border Background="{DynamicResource SystemAccentColor}" 
 							CornerRadius="12" 
 							Padding="8,2" 
 							IsVisible="{Binding IsDataLoaded}"
@@ -63,6 +56,23 @@
 									   Opacity="0.9"/>
 						</StackPanel>
 					</Border>
+							<TextBlock Text="Repository:"
+								   FontSize="16"
+								   FontWeight="SemiBold"
+								   VerticalAlignment="Center"
+								   IsVisible="{Binding IsDataLoaded}"/>
+							<TextBlock Text="{Binding DisplayRepositoryPath}"
+							   VerticalAlignment="Center"
+							   FontStyle="Italic"
+							   Opacity="0.7"
+							   TextTrimming="CharacterEllipsis"
+							   MaxWidth="450"
+							   IsVisible="{Binding IsDataLoaded}"/>
+
+
+
+
+
 				</StackPanel>
 
 				<!-- Zone 3: Right Actions & Toggles (Pinned Right) -->
@@ -179,18 +189,20 @@
 					</Border>
 
 					<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">						
-						<Panel Margin="15">
+						<Panel Margin="5">
 							<controls:NativeHtmlPreviewer
                                 HtmlSource="{Binding RawHtmlContent}"
                                 TextWrapping="Wrap"
 								VerticalAlignment="Top"
-                                IsVisible="{Binding !IsClassicViewEnabled}"/>
+                                IsVisible="{Binding !IsClassicViewEnabled}" 
+								MaxWidth="460"/>
 
 							<controls:ClassicHtmlPreviewer
 								HtmlSource="{Binding RawHtmlContent}"
 								CssStyles="{Binding InjectedStyles}"
 								VerticalAlignment="Top"
-								IsVisible="{Binding IsClassicViewEnabled}"/>
+								IsVisible="{Binding IsClassicViewEnabled}"
+								MaxWidth="460"/>
 						</Panel>
 					</ScrollViewer>
 				</Grid>

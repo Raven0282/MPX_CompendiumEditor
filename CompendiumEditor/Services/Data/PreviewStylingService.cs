@@ -65,6 +65,30 @@ public class PreviewStylingService : IPreviewStylingService
         sb.AppendLine(BaseCss);
         sb.AppendLine(isDarkMode ? DarkModeCss : LightModeCss);
 
+        // 1. Load Global Styles (AppData)
+        string globalStylesDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CompendiumEditor", "Styles");
+        if (!Directory.Exists(globalStylesDir))
+        {
+            Directory.CreateDirectory(globalStylesDir);
+        }
+
+        string globalCssPath = Path.Combine(globalStylesDir, "_preview.css");
+        if (File.Exists(globalCssPath))
+        {
+            try
+            {
+                _logger.Log($"Injecting global styles from {globalCssPath}", "STYLING:GLOBAL");
+                string globalCss = File.ReadAllText(globalCssPath);
+                sb.AppendLine("/* Global Styles */");
+                sb.AppendLine(globalCss);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex, "STYLING:GLOBAL_CSS");
+            }
+        }
+
+        // 2. Load Local Overrides (Repository)
         if (!string.IsNullOrEmpty(repositoryPath))
         {
             string userCssPath = Path.Combine(repositoryPath, "_preview.css");
@@ -72,14 +96,14 @@ public class PreviewStylingService : IPreviewStylingService
             {
                 try
                 {
-                    _logger.Log("Injecting user-defined styles from _preview.css", "STYLING");
+                    _logger.Log("Injecting repository-specific overrides from _preview.css", "STYLING:LOCAL");
                     string userCss = File.ReadAllText(userCssPath);
-                    sb.AppendLine("/* User Overrides */");
+                    sb.AppendLine("/* Local Overrides */");
                     sb.AppendLine(userCss);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogException(ex, "STYLING:USER_CSS");
+                    _logger.LogException(ex, "STYLING:LOCAL_CSS");
                 }
             }
         }

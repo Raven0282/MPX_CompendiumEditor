@@ -31,8 +31,8 @@ public partial class NewRecordDialog : Window, INotifyPropertyChanged
         set { _sourceBook = value; OnPropertyChanged(); } 
     }
 
-    private ObservableCollection<string> _existingSources = new();
-    public ObservableCollection<string> ExistingSources
+    private IEnumerable<string> _existingSources = new List<string>();
+    public IEnumerable<string> ExistingSources
     {
         get => _existingSources;
         set { _existingSources = value; OnPropertyChanged(); }
