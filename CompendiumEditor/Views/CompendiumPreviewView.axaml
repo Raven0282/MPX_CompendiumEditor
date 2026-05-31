@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CompendiumEditor.ViewModels"
+             xmlns:controls="using:CompendiumEditor.Controls"
+             x:Class="CompendiumEditor.Views.CompendiumPreviewView"
+             x:DataType="vm:MainWindowViewModel">
+    
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Text="Output Display Preview" HorizontalAlignment="Center" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" 
+                        Command="{Binding TogglePreviewPopOutCommand}"
+                        Padding="4" Background="Transparent" BorderThickness="0">
+                    <TextBlock Text="↗" FontSize="16" FontWeight="Bold"/>
+                    <ToolTip.Tip>Pop-out Preview Window</ToolTip.Tip>
+                </Button>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" Name="PreviewScrollViewer"
+                      HorizontalScrollBarVisibility="Disabled" 
+                      VerticalScrollBarVisibility="Auto">
+            <Panel Margin="15">
+                <controls:NativeHtmlPreviewer
+                    HtmlSource="{Binding RawHtmlContent}"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding !IsClassicViewEnabled}"/>
+
+                <controls:ClassicHtmlPreviewer
+                    HtmlSource="{Binding RawHtmlContent}"
+                    CssStyles="{Binding InjectedStyles}"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding IsClassicViewEnabled}"/>
+            </Panel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -81,6 +81,12 @@ namespace CompendiumEditor.ViewModels
         private bool _isAppendMode;
 
         [ObservableProperty]
+        private bool _isPreviewPoppedOut;
+
+        [ObservableProperty]
+        private bool _isEditorPoppedOut;
+
+        [ObservableProperty]
         private bool _showValidationErrorAlert;
 
         [ObservableProperty]
@@ -345,6 +351,56 @@ namespace CompendiumEditor.ViewModels
                 ValidationErrorTitle = "Append Operation Failure";
                 ValidationErrorMessage = $"Failed to append new record: {ex.Message}";
                 ShowValidationErrorAlert = true;
+            }
+        }
+
+        private Views.PopOutEditorWindow? _popOutEditorWindow;
+
+        [RelayCommand]
+        public void ToggleEditorPopOut()
+        {
+            if (IsEditorPoppedOut)
+            {
+                _popOutEditorWindow?.Close();
+                _popOutEditorWindow = null;
+                IsEditorPoppedOut = false;
+            }
+            else
+            {
+                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+                {
+                    _popOutEditorWindow = new Views.PopOutEditorWindow
+                    {
+                        DataContext = this
+                    };
+                    _popOutEditorWindow.Show();
+                    IsEditorPoppedOut = true;
+                }
+            }
+        }
+
+        private Views.PopOutPreviewWindow? _popOutWindow;
+
+        [RelayCommand]
+        public void TogglePreviewPopOut()
+        {
+            if (IsPreviewPoppedOut)
+            {
+                _popOutWindow?.Close();
+                _popOutWindow = null;
+                IsPreviewPoppedOut = false;
+            }
+            else
+            {
+                if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+                {
+                    _popOutWindow = new Views.PopOutPreviewWindow
+                    {
+                        DataContext = this
+                    };
+                    _popOutWindow.Show();
+                    IsPreviewPoppedOut = true;
+                }
             }
         }
 

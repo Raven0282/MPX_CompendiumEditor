@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CompendiumEditor.ViewModels"
+             xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             x:Class="CompendiumEditor.Views.RawEditorView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Text="RAW Source Markup Editor" HorizontalAlignment="Center" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" 
+                        Command="{Binding ToggleEditorPopOutCommand}"
+                        Padding="4" Background="Transparent" BorderThickness="0">
+                    <TextBlock Text="↗" FontSize="16" FontWeight="Bold"/>
+                    <ToolTip.Tip>Pop-out Editor Window</ToolTip.Tip>
+                </Button>
+            </Grid>
+        </Border>
+
+        <ae:TextEditor Grid.Row="1" Name="MarkupDocumentEditor"
+                       Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       FontFamily="Consolas,JetBrains Mono,Courier New"
+                       FontSize="14"
+                       ShowLineNumbers="True"
+                       WordWrap="True"
+                       HorizontalScrollBarVisibility="Disabled"
+                       VerticalScrollBarVisibility="Visible"/>
+    </Grid>
+</UserControl>

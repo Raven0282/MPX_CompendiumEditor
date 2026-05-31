@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:CompendiumEditor.ViewModels"
+        xmlns:views="using:CompendiumEditor.Views"
         xmlns:controls="using:CompendiumEditor.Controls"
         xmlns:ae="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -20,7 +21,8 @@
 
 	<Grid RowDefinitions="Auto, *">
 
-	<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="20" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
+		<!-- Top Navigation Menu (Stable 3-Zone Layout) -->
+		<Border Grid.Row="0" Background="{DynamicResource SystemChromeLowColor}" Padding="20" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}">
 			<Grid ColumnDefinitions="Auto, *, Auto">
 
 				<!-- Zone 1: Left Actions (Fixed) -->
@@ -39,7 +41,7 @@
 
 				<!-- Zone 2: Centered Metadata (Fluid but non-shifting) -->
 				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" HorizontalAlignment="Left" VerticalAlignment="Center">
-						<Border Background="{DynamicResource SystemAccentColor}" 
+					<Border Background="{DynamicResource SystemAccentColor}" 
 							CornerRadius="12" 
 							Padding="8,2" 
 							IsVisible="{Binding IsDataLoaded}"
@@ -56,23 +58,20 @@
 									   Opacity="0.9"/>
 						</StackPanel>
 					</Border>
-							<TextBlock Text="Repository:"
-								   FontSize="16"
-								   FontWeight="SemiBold"
-								   VerticalAlignment="Center"
-								   IsVisible="{Binding IsDataLoaded}"/>
-							<TextBlock Text="{Binding DisplayRepositoryPath}"
+					
+					<TextBlock Text="Repository:"
+							   FontSize="16"
+							   FontWeight="SemiBold"
+							   VerticalAlignment="Center"
+							   IsVisible="{Binding IsDataLoaded}"/>
+					
+					<TextBlock Text="{Binding DisplayRepositoryPath}"
 							   VerticalAlignment="Center"
 							   FontStyle="Italic"
 							   Opacity="0.7"
 							   TextTrimming="CharacterEllipsis"
 							   MaxWidth="450"
 							   IsVisible="{Binding IsDataLoaded}"/>
-
-
-
-
-
 				</StackPanel>
 
 				<!-- Zone 3: Right Actions & Toggles (Pinned Right) -->
@@ -108,7 +107,10 @@
 			</Grid>
 		</Border>
 
-	<Grid Grid.Row="1" ColumnDefinitions="400, 5, *, 5, *">
+		<!-- Main Content Area -->
+		<Grid Grid.Row="1" ColumnDefinitions="400, 5, *, 5, *">
+			
+			<!-- Validation Alert Layer -->
 			<Panel Grid.Column="0" Grid.ColumnSpan="5" ZIndex="100"
                    Background="#AA000000"
                    IsVisible="{Binding ShowValidationErrorAlert}">
@@ -139,6 +141,7 @@
 				</Border>
 			</Panel>
 
+			<!-- Left Column: Search and Grid -->
 			<Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="10">
 				<TextBox Grid.Row="0"
                          Text="{Binding SearchQuery, Mode=TwoWay}"
@@ -163,49 +166,46 @@
 
 			<GridSplitter Grid.Column="1" Background="Transparent"/>
 
+			<!-- Middle Column: RAW Editor with Pop-out support -->
 			<Border Grid.Column="2" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10">
-				<Grid RowDefinitions="Auto, *">
-					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
-						<TextBlock Text="RAW Source Markup Editor" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+				<Panel>
+					<!-- Embedded View (Hidden when popped out) -->
+					<views:RawEditorView IsVisible="{Binding !IsEditorPoppedOut}"/>
+
+					<!-- Ghost State Placeholder (Shown when popped out) -->
+					<Border IsVisible="{Binding IsEditorPoppedOut}" Background="{DynamicResource SystemChromeLowColor}">
+						<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+							<TextBlock Text="✍️" FontSize="32" HorizontalAlignment="Center"/>
+							<TextBlock Text="Editing in separate window..." Opacity="0.6" HorizontalAlignment="Center"/>
+							<Button Content="Return to Main Window" 
+									Command="{Binding ToggleEditorPopOutCommand}"
+									HorizontalAlignment="Center"
+									Margin="0,10,0,0"/>
+						</StackPanel>
 					</Border>
-					<ae:TextEditor Grid.Row="1" Name="MarkupDocumentEditor"
-                                   Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                   FontFamily="Consolas,JetBrains Mono,Courier New"
-                                   FontSize="14"
-                                   ShowLineNumbers="True"
-                                   WordWrap="True"
-                                   HorizontalScrollBarVisibility="Disabled"
-                                   VerticalScrollBarVisibility="Visible"/>
-				</Grid>
+				</Panel>
 			</Border>
 
 			<GridSplitter Grid.Column="3" Background="Transparent"/>
 
+			<!-- Right Column: Integrated Preview with Pop-out support -->
 			<Border Grid.Column="4" BorderThickness="1" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Margin="5,10,10,10">
-				<Grid RowDefinitions="Auto, *">
-					<Border Grid.Row="0" Background="{DynamicResource SystemListLowColor}" Padding="6">
-						<TextBlock Text="Output Display Preview" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+				<Panel>
+					<!-- Embedded View (Hidden when popped out) -->
+					<views:CompendiumPreviewView IsVisible="{Binding !IsPreviewPoppedOut}"/>
+
+					<!-- Ghost State Placeholder (Shown when popped out) -->
+					<Border IsVisible="{Binding IsPreviewPoppedOut}" Background="{DynamicResource SystemChromeLowColor}">
+						<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+							<TextBlock Text="📋" FontSize="32" HorizontalAlignment="Center"/>
+							<TextBlock Text="Previewing in separate window..." Opacity="0.6" HorizontalAlignment="Center"/>
+							<Button Content="Return to Main Window" 
+									Command="{Binding TogglePreviewPopOutCommand}"
+									HorizontalAlignment="Center"
+									Margin="0,10,0,0"/>
+						</StackPanel>
 					</Border>
-
-					<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">						
-						<Panel Margin="5">
-							<controls:NativeHtmlPreviewer
-                                HtmlSource="{Binding RawHtmlContent}"
-                                TextWrapping="Wrap"
-								VerticalAlignment="Top"
-                                IsVisible="{Binding !IsClassicViewEnabled}" 
-								MaxWidth="460"/>
-
-							<controls:ClassicHtmlPreviewer
-								HtmlSource="{Binding RawHtmlContent}"
-								CssStyles="{Binding InjectedStyles}"
-								VerticalAlignment="Top"
-								IsVisible="{Binding IsClassicViewEnabled}"
-								MaxWidth="460"/>
-						</Panel>
-					</ScrollViewer>
-				</Grid>
+				</Panel>
 			</Border>
 
 		</Grid>
