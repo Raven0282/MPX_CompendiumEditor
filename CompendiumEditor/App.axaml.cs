@@ -73,6 +73,11 @@ public partial class App : Application
         services.AddSingleton<ICategoryCompendiumWriter, PowerCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, FeatCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, ItemCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, TrapCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, WeaponCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, ImplementCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, ParagonPathCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, RitualCompendiumWriter>();
         services.AddSingleton<ICompendiumWriter, CompendiumWriterDispatcher>();
 
         // --- Presentation ViewModels Layer ---
