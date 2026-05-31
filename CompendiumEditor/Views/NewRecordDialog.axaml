@@ -4,14 +4,14 @@
         xmlns:views="using:CompendiumEditor.Views"
         x:Class="CompendiumEditor.Views.NewRecordDialog"
         x:DataType="views:NewRecordDialog"
-        Title="Initialize New Comp  bendium Record"
+        Title="MPX - Initialize a Compendium Record"
         Width="400" Height="310"
         WindowStartupLocation="CenterOwner"
         CanResize="False">
     
     <Border Padding="20">
         <StackPanel Spacing="15">
-            <TextBlock Text="New Record Metadata" FontSize="18" FontWeight="Bold"/>
+            <TextBlock Text="New Compendium Entry" FontSize="18" FontWeight="Bold"/>
             
             <StackPanel Spacing="5">
                 <TextBlock Text="Generated ID (Read-Only):" Opacity="0.7" FontSize="12"/>
@@ -19,12 +19,19 @@
             </StackPanel>
 
             <StackPanel Spacing="5">
-                <TextBlock Text="Entry Name:" FontSize="12"/>
-                <TextBox Text="{Binding RecordName, Mode=TwoWay}" Watermark="e.g. Cleave, Fireball, Orc Grunt"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Entry Name:" FontSize="12"/>
+                    <TextBlock Text="* Required" Foreground="OrangeRed" FontSize="12"/>
+                </StackPanel>
+                <TextBox Text="{Binding RecordName, Mode=TwoWay}" PlaceholderText="e.g. Cleave, Fireball, Orc Grunt, Scion of Danger, etc."/>
             </StackPanel>
 
             <StackPanel Spacing="5">
-                <TextBlock Text="Source Book:" FontSize="12"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Source Book:" FontSize="12"/>
+                    <TextBlock Text="* Required" Foreground="OrangeRed" FontSize="12"/>
+                </StackPanel>
+                
                 <ComboBox ItemsSource="{Binding ExistingSources}"
                           Text="{Binding SourceBook, Mode=TwoWay}"
                           IsEditable="True"

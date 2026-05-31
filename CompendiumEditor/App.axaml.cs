@@ -78,6 +78,7 @@ public partial class App : Application
         services.AddSingleton<ICategoryCompendiumWriter, ImplementCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, ParagonPathCompendiumWriter>();
         services.AddSingleton<ICategoryCompendiumWriter, RitualCompendiumWriter>();
+        services.AddSingleton<ICategoryCompendiumWriter, DeityCompendiumWriter>();
         services.AddSingleton<ICompendiumWriter, CompendiumWriterDispatcher>();
 
         // --- Presentation ViewModels Layer ---
