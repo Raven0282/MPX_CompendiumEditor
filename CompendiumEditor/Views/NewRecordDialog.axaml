@@ -5,6 +5,7 @@
         x:Class="CompendiumEditor.Views.NewRecordDialog"
         x:DataType="views:NewRecordDialog"
         Title="MPX - Initialize a Compendium Record"
+        Icon="/Assets/Images/logo-small-icon.ico"
         Width="400" Height="310"
         WindowStartupLocation="CenterOwner"
         CanResize="False">
