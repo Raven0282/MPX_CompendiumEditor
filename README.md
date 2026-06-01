@@ -38,6 +38,6 @@ After selecting a repository folder you will see a count of the number of items 
 
 Both the Editor and the Preview Pane can be detached from the application and placed anywhere, including a separate monitor for easier (i.e., larger) data entry windows. When the panes are closed they return to the main window.  If you close the main window the panes will NOT close automatically.  Please save your work.
 
-The Compendium Editor is capable of using your style sheets for displaying the Preview. Follow the format and place your file in your %AppData%\Local\CompendiumEditor\Styles
+The Compendium Editor is capable of using your style sheets for displaying the Preview. Follow the format and place your file in your %AppData%\Local\CompendiumEditor\Styles folder.
 
 
