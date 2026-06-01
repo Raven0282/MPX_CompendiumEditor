@@ -34,7 +34,7 @@ When entering a source, the listing should filter based on what sources exist fo
 8. To verify your changes - Go to your local copy of the compendium and open the index.html file.  A browser window with the Online Compendium will allow you to search for the changes you have made.
 
 ## Features
-After selecting a repository folder you will see a count of the number of items that are part of that category.  You can use this to number to confirm your addition to the records on your local Online Compendium.  The application will update the global count of items as you edit.
+After selecting a repository folder you will see a count of the number of items that are part of that category.  You can use this number to confirm your addition to the records on your local Online Compendium.  The application will update the global count of items as you edit.
 
 Both the Editor and the Preview Pane can be detached from the application and placed anywhere, including a separate monitor for easier (i.e., larger) data entry windows. When the panes are closed they return to the main window.  If you close the main window the panes will NOT close automatically.  Please save your work.
 
