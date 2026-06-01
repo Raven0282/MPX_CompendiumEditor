@@ -24,7 +24,7 @@ public partial class NewRecordDialog : Window, INotifyPropertyChanged
         set { _recordName = value; OnPropertyChanged(); } 
     }
 
-    private string? _sourceBook = "Custom";
+    private string? _sourceBook = "Custom Source...";
     public string? SourceBook 
     { 
         get => _sourceBook; 

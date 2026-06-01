@@ -37,7 +37,7 @@
                                  Text="{Binding SourceBook, Mode=TwoWay}"
                                  FilterMode="Contains"
                                  MinimumPrefixLength="0"
-                                 Watermark="Select or type new source..."
+                                 PlaceholderText="Select or type new source..."
                                  HorizontalAlignment="Stretch"/>
             </StackPanel>
 

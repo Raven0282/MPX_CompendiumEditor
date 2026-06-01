@@ -42,11 +42,18 @@ public partial class App : Application
         // 3. Apply Theme Variant based on configuration
         RequestedThemeVariant = config.ThemeMode == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
 
-        // 4. Bind MainWindow and Contexts across App Life Cycle
+        // 4. Bind MainWindow or MainView across App Life Cycle
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var mainWindow = Services.GetRequiredService<MainWindow>();
             desktop.MainWindow = mainWindow;
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
+            singleView.MainView = new MainView
+            {
+                DataContext = Services.GetRequiredService<MainWindowViewModel>()
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
