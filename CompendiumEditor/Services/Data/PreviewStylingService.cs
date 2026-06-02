@@ -18,12 +18,11 @@ public class PreviewStylingService : IPreviewStylingService
         body { 
             font-family: 'Segoe UI', Helvetica, Arial, sans-serif; 
             font-size: 13px; 
-            margin: 0; 
+            margin: 0;
             padding: 10px 10px 50px 10px;
             word-wrap: break-word;
-            overflow-wrap: break-word;
-
-            word-break: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             line-height: 1.4;
         }
         h1 { font-size: 18px; font-weight: bold; margin: 0 0 4px 0; padding-bottom: 2px; border-bottom: 1px solid; }
@@ -35,7 +34,7 @@ public class PreviewStylingService : IPreviewStylingService
         p.publishedIn { font-size: 11px; font-style: italic; margin-top: 15px; border-top: 1px solid #ccc; padding-top: 5px; }
         b { font-weight: bold; }
         i { font-style: italic; }
-        table { max-width: 90%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
+        table { max-width: 85%; border-collapse: collapse; margin: 10px 0; table-layout: fixed; }
         th { text-align: left; font-weight: bold; border-bottom: 1px solid #999; padding: 2px; word-wrap: break-word; }
         td { padding: 2px; vertical-align: top; word-wrap: break-word; }
         .ritualstats { display: block; padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; }

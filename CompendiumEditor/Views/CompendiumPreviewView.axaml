@@ -18,22 +18,27 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1" Name="PreviewScrollViewer"
-                      HorizontalScrollBarVisibility="Auto" 
-                      VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" MaxWidth="800" Name="PreviewScrollViewer"
+                Padding="10"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto">
             <Panel Margin="10">
                 <controls:NativeHtmlPreviewer
                     HtmlSource="{Binding RawHtmlContent}"
                     TextWrapping="Wrap"
                     VerticalAlignment="Top"
+                    MaxWidth="{Binding MaxWidth, ElementName=PreviewScrollViewer}"
                     IsVisible="{Binding !IsClassicViewEnabled}"/>
 
                 <controls:ClassicHtmlPreviewer
                     HtmlSource="{Binding RawHtmlContent}"
                     CssStyles="{Binding InjectedStyles}"
                     VerticalAlignment="Top"
+                    MaxWidth="{Binding MaxWidth, ElementName=PreviewScrollViewer}"
                     IsVisible="{Binding IsClassicViewEnabled}"/>
             </Panel>
+
+  
         </ScrollViewer>
     </Grid>
 </UserControl>

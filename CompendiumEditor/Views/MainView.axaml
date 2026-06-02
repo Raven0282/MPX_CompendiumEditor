@@ -86,8 +86,8 @@
                     </Panel>
                     
                     <ToggleSwitch IsChecked="{Binding IsClassicViewEnabled}"
-                                  OnContent="Classic View (HTML)"
-                                  OffContent="Modern View (Native)"
+                                  OnContent="Format View (HTML)"
+                                  OffContent="Markup View (Native)"
                                   VerticalAlignment="Center"/>
 
                     <ToggleSwitch IsChecked="{Binding IsDarkMode}"
