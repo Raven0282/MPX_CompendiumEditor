@@ -1,0 +1,125 @@
+/* 
+   MasterplanXP - Classic 4e Preview Stylesheet
+   Save this file as '_preview.css' in your repository root to activate.
+*/
+
+/* --- 1. CORE TYPOGRAPHY --- */
+body {
+    font-family: "Segoe UI", Calibri, "Trebuchet MS", sans-serif;
+    line-height: 1.3;
+}
+
+/* --- 2. THEMATIC HEADERS (Power Types) --- */
+
+/* At-Will Powers: Classic Green */
+h1.atwillpower {
+    background-color: #316521;
+    color: #FFFFFF !important;
+    padding: 3px 8px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Encounter Powers: Classic Dark Red */
+h1.encounterpower {
+    background-color: #611C23;
+    color: #FFFFFF !important;
+    padding: 3px 8px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Daily Powers: Classic Grey/Black */
+h1.dailypower {
+    background-color: #4D4D4F;
+    color: #FFFFFF !important;
+    padding: 3px 8px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Monster Headers: Classic Olive/Gold */
+h1.monster {
+    background-color: #4E5C2E;
+    color: #FFFFFF !important;
+    padding: 3px 8px;
+    border-bottom: 1px solid #CECA9D;
+}
+
+/* General Player Options: Classic Crimson */
+h1.player {
+    color: #B11226;
+    border-bottom: 2px solid #B11226;
+    background: transparent;
+}
+
+/* --- 3. STAT BLOCKS & LAYOUT --- */
+
+/* The Power Stat Bar (Type, Action, Keywords) */
+p.powerstat {
+    background-color: #D6D6C2;
+    color: #000000;
+    padding: 2px 8px;
+    margin: 0;
+    border-bottom: 1px solid #FFFFFF;
+    font-size: 12px;
+}
+
+/* Level indicator in headers */
+span.level {
+    float: right;
+    font-weight: normal;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Flavor text */
+p.flavor {
+    font-style: italic;
+    color: #000000;
+    padding: 4px 8px;
+    margin: 0;
+}
+
+/* Tables (alternating rows) */
+table {
+    margin-top: 8px;
+}
+tr:nth-child(odd) {
+    background-color: #E7E7D6;
+}
+tr:nth-child(even) {
+    background-color: #FFFFFF;
+}
+th {
+    background-color: #4E5C2E;
+    color: white;
+}
+
+/* The 4e Diamond/Star Symbol */
+.star {
+    color: #316521;
+    font-weight: bold;
+    margin: 0 4px;
+}
+
+/* --- 4. DARK MODE OVERRIDES --- */
+/* These will apply if the app is in Dark Mode, ensuring high-fidelity colors remain readable */
+@media (prefers-color-scheme: dark) {
+    p.powerstat {
+        background-color: #3D3D35;
+        color: #E0E0E0;
+    }
+    p.flavor {
+        color: #CCCCCC;
+    }
+    tr:nth-child(odd) {
+        background-color: #2D2D2A;
+    }
+    tr:nth-child(even) {
+        background-color: #1E1E1E;
+    }
+    th {
+        background-color: #313A1D;
+    }
+}

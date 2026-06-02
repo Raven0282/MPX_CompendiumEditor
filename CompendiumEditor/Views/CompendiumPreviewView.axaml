@@ -19,9 +19,9 @@
         </Border>
 
         <ScrollViewer Grid.Row="1" Name="PreviewScrollViewer"
-                      HorizontalScrollBarVisibility="Disabled" 
+                      HorizontalScrollBarVisibility="Auto" 
                       VerticalScrollBarVisibility="Auto">
-            <Panel Margin="15">
+            <Panel Margin="10">
                 <controls:NativeHtmlPreviewer
                     HtmlSource="{Binding RawHtmlContent}"
                     TextWrapping="Wrap"
