@@ -26,10 +26,23 @@ namespace CompendiumEditor.ViewModels
         private readonly IConfigurationService _configurationService;
         private readonly ICompendiumExtractor _compendiumExtractor;
         private readonly ICompendiumWriter _compendiumWriter;
+        private readonly IPreviewStylingService _stylingService;
         private readonly IDiagnosticLogger _logger;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayRepositoryPath))]
         private string? _repositoryPath;
+
+        public string DisplayRepositoryPath
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(RepositoryPath)) return string.Empty;
+                var segments = RepositoryPath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length <= 4) return RepositoryPath;
+                return "... " + Path.DirectorySeparatorChar + string.Join(Path.DirectorySeparatorChar, segments.Skip(segments.Length - 4));
+            }
+        }
 
         [ObservableProperty]
         private bool _isDataLoaded;
@@ -52,6 +65,9 @@ namespace CompendiumEditor.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveChangesCommand))]
         private string? _rawHtmlContent;
+
+        [ObservableProperty]
+        private string _injectedStyles = string.Empty;
 
         private string? _originalHtmlContent;
 
@@ -77,15 +93,19 @@ namespace CompendiumEditor.ViewModels
             IConfigurationService configurationService,
             ICompendiumExtractor compendiumExtractor,
             ICompendiumWriter compendiumWriter,
+            IPreviewStylingService stylingService,
             IDiagnosticLogger logger)
         {
             _configurationService = configurationService;
             _compendiumExtractor = compendiumExtractor;
             _compendiumWriter = compendiumWriter;
+            _stylingService = stylingService;
             _logger = logger;
 
             RepositoryPath = _configurationService.LastRepositoryPath;
             IsDarkMode = _configurationService.ThemeMode != "Light";
+            
+            UpdateActiveStyles();
 
             if (!string.IsNullOrWhiteSpace(RepositoryPath))
             {
@@ -113,6 +133,12 @@ namespace CompendiumEditor.ViewModels
             {
                 Application.Current.RequestedThemeVariant = value ? ThemeVariant.Dark : ThemeVariant.Light;
             }
+            UpdateActiveStyles();
+        }
+
+        private void UpdateActiveStyles()
+        {
+            InjectedStyles = _stylingService.GetActiveStyles(IsDarkMode, RepositoryPath);
         }
 
         private void ApplyFiltering()
@@ -171,6 +197,7 @@ namespace CompendiumEditor.ViewModels
                     RepositoryPath = path;
                     _configurationService.LastRepositoryPath = path;
                     _configurationService.SaveSettings();
+                    UpdateActiveStyles();
                     await InitializeRepositoryAsync(path);
                 }
             }

@@ -61,6 +61,7 @@ public partial class App : Application
         services.AddSingleton<IDiagnosticLogger, DiagnosticLogger>();
         services.AddSingleton<IConfigurationService, ConfigurationService>();
         services.AddSingleton<ICompendiumExtractor, CompendiumExtractor>();
+        services.AddSingleton<IPreviewStylingService, PreviewStylingService>();
         
         // --- Compendium Writer Strategy Pattern ---
         services.AddSingleton<GeneralCompendiumWriter>();
