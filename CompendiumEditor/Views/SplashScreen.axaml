@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        mc:Ignorable="d" Width="500" Height="350"
+        x:Class="CompendiumEditor.Views.SplashScreen"
+        Title="SplashScreen"
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent">
+    <Panel>
+        <Border Background="#2D2D2D" CornerRadius="10" Padding="20">
+            <Grid RowDefinitions="*, Auto">
+                <Image Source="/Assets/Images/logo-mpx.png" Width="500" Height="350" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="1" Text="MasterplanXP Compendium Editor" 
+                           Foreground="White" HorizontalAlignment="Center" 
+                           FontSize="16" Margin="0,10,0,0"/>
+            </Grid>
+        </Border>
+    </Panel>
+</Window>

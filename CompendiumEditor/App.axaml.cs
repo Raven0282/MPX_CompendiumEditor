@@ -11,6 +11,7 @@ using CompendiumEditor.Services.Data;
 using CompendiumEditor.Services.Logging;
 using CompendiumEditor.ViewModels;
 using CompendiumEditor.Views;
+using System.Threading.Tasks;
 
 namespace CompendiumEditor
 {
@@ -27,7 +28,7 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
         // 1. Initialize Dependency Injection Container Mappings
         var serviceCollection = new ServiceCollection();
@@ -45,8 +46,21 @@ public partial class App : Application
         // 4. Bind MainWindow or MainView across App Life Cycle
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = Services.GetRequiredService<MainWindow>();
-            desktop.MainWindow = mainWindow;
+                var splash = new SplashScreen();
+                desktop.MainWindow = splash;
+                splash.Show();
+
+                // Wait for 3 seconds to show the logo
+                await System.Threading.Tasks.Task.Delay(3000);
+
+                var mainWin = new MainWindow
+                {
+                    DataContext = Services.GetRequiredService<MainWindowViewModel>(),
+                };
+                
+                desktop.MainWindow = mainWin;
+                mainWin.Show();
+                splash.Close();
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
