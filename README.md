@@ -3,9 +3,9 @@
 
 ### MasterplanXP module for modifying and adding to the Online Compendium.
 
-## Installation Instructions - Pending
+## Installation Instructions - WIP
 Install the Compendium Editor
-  - Windows
+  - Windows - Extract the files from the .zip archive.  Double click CompendiumEditor.Desktop.exe.
   - Linux
   - MacOS
 
