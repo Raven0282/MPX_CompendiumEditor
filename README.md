@@ -1,15 +1,22 @@
+<img width="300" height="193" alt="logo-mpx" src="https://github.com/user-attachments/assets/0d41a780-c18c-4089-9276-e5dad8b85725" />
+
 # Masterplan XP - Compendium Editor
 *** This is an ALPHA BUILD - Make backup copies of your original files. Use at your own risk. ***
+
 
 ### MasterplanXP module for modifying and adding to the Online Compendium.
 
 ## Installation Instructions - WIP
 Install the Compendium Editor
-  - Windows - Extract the files from the .zip archive.  Double click CompendiumEditor.Desktop.exe.
-  - Linux
-  - MacOS
+  - Windows
+    1. Download the .zip archive - https://tools.gamerssyndicate.net/parts/masterplan/MPX_CompendiumEditor.zip
+    2. Extract the files from the .zip archive.
+    3. Double click (run) CompendiumEditor.Desktop.exe.
+ 
+  - Linux - WIP
+  - MacOS - WIP
 
-Any work with the Online Compendium assumes you have downloaded a local copy. Online Compendium is located on Gihub: https://github.com/mbutler/iws.mx-dnd
+Any work with the Online Compendium assumes you have downloaded a local copy of the Online Compendium. The Online Compendium is located on Gihub: https://github.com/mbutler/iws.mx-dnd
 
 ## How to Edit with the Compendium Editor
 1. Open the Compendium Editor  
