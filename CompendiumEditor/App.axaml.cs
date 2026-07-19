@@ -51,7 +51,7 @@ public partial class App : Application
                 splash.Show();
 
                 // Wait for 3 seconds to show the logo
-                await System.Threading.Tasks.Task.Delay(3000);
+                await System.Threading.Tasks.Task.Delay(2000);
 
                 var mainWin = new MainWindow
                 {
